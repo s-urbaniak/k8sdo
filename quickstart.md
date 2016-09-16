@@ -17,8 +17,7 @@ Get the internal IP address of the etcd instance:
 
 ```
 $ doctl compute droplet list
-$ doctl compute droplet get "${ETCD_1_ID}" -o json | jq -r -c '.[].networks.v4[] | select(.type=="private").ip_address'
-10.135.20.79
+$ export ETCD_IP=$(doctl compute droplet get 25997786 -o json | jq -r -c '.[].networks.v4[] | select(.type=="private").ip_address')
 ```
 
 Create a new Droplet, a bigger master machine:
@@ -44,10 +43,11 @@ $ sudo rkt run quay.io/coreos/bootkube:v0.1.4 \
     --exec=/bootkube \
     -- render \
     --asset-dir=/core/cluster \
-    --api-servers=https://${COREOS_PUBLIC_IP}:443 \
+    --api-servers=https://${COREOS_PUBLIC_IPV4}:443 \
     --etcd-servers=http://${ETCD_IP}:2379
 $ chmod ...
-$ cp cluster/auth/kubeconf /etc/kubernetes/kubeconf
+$ sudo cp cluster/auth/kubeconfig /etc/kubernetes/kubeconfig
+$ sudo systemctl start kubelet
 ```
 
 ```

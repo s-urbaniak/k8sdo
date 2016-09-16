@@ -23,4 +23,4 @@ doctl compute droplet create "master-1" \
       --size "${ETCD_SIZE}" \
       --enable-private-networking \
       --ssh-keys '"'"${SSH_KEY}"'"' \
-      --user-data-file cluster/user-data-master
+      --user-data-file user-data-master

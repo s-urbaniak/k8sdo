@@ -30,6 +30,7 @@ coreos:
         [Install]
         WantedBy=multi-user.target
     - name: kubelet.service
+      enable: true
       content: |
         [Service]
         EnvironmentFile=/etc/environment
