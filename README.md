@@ -7,6 +7,14 @@ Set up a read/write API token in Digital Ocean. Install doctl [1], and initializ
 $ doctl auth init
 ```
 
+Export your SSH fingerprint:
+
+```
+$ ssh-keygen -E md5 -l -f ~/.ssh/id_rsa.pub
+2048 MD5:xx:xx:xx:xx:xx:xx:xx:xx:xx:ab:19:db:52:cb:08:97 no comment (RSA)
+$ export SSH_KEY="xx:xx:xx:xx:xx:xx:xx:xx:xx:ab:19:db:52:cb:08:97"
+```
+
 ### Launch etcd
 
 ```
