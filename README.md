@@ -25,6 +25,7 @@ Create a new Droplet, a bigger master machine:
 $ ./master-up.sh
 ```
 
+Render k8s manifests
 ```
 $ doctl compute droplet list
 ID		Name		Public IPv4	Public IPv6	Memory	VCPUs	Disk	Region	Image			Status	Tags
@@ -46,9 +47,12 @@ $ sudo rkt run quay.io/coreos/bootkube:v0.1.4 \
     --api-servers=https://${COREOS_PUBLIC_IPV4}:443 \
     --etcd-servers=http://${ETCD_IP}:2379
 $ chmod ...
+$ sudo mkdir -p /etc/kubernetes
 $ sudo cp cluster/auth/kubeconfig /etc/kubernetes/kubeconfig
 $ sudo systemctl start kubelet
 ```
+
+Start bootkube
 
 ```
 $ sudo rkt run quay.io/coreos/bootkube:v0.1.4 \
@@ -60,6 +64,24 @@ $ sudo rkt run quay.io/coreos/bootkube:v0.1.4 \
     -- start \
     --asset-dir=/core/cluster \
     --etcd-server=http://${ETCD_IP}:2379
+```
+
+Configure client
+```
+$ export MASTER_IP=46.101.244.90
+
+$ scp -r core@${MASTER_IP}:~/cluster .
+
+$ kubectl config set-cluster do \
+    --server=https://${MASTER_IP}:443
+
+$ kubectl config set-credentials do \
+    --client-certificate=cluster/tls/apiserver.crt \
+    --client-key=cluster/tls/apiserver.key
+
+$ kubectl config set-context do --cluster=do --user=do
+
+$ kubectl config use-context do
 ```
 
 [1] https://github.com/digitalocean/doctl
