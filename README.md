@@ -54,7 +54,7 @@ $ sudo rkt run quay.io/coreos/bootkube:v0.1.4 \
     --asset-dir=/core/cluster \
     --api-servers=https://${COREOS_PUBLIC_IPV4}:443 \
     --etcd-servers=http://${ETCD_IP}:2379
-$ chmod ...
+$ sudo chown -R core:core cluster
 $ sudo mkdir -p /etc/kubernetes
 $ sudo cp cluster/auth/kubeconfig /etc/kubernetes/kubeconfig
 $ sudo systemctl start kubelet
