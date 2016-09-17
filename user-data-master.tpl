@@ -54,6 +54,7 @@ coreos:
           --config=/etc/kubernetes/manifests \
           --allow-privileged \
           --hostname-override=${COREOS_PUBLIC_IPV4} \
+          --address=$private_ipv4 \
           --node-labels=master=true \
           --minimum-container-ttl-duration=3m0s \
           --cluster_dns=10.3.0.10 \
