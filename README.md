@@ -33,7 +33,7 @@ Create a new Droplet, a bigger master machine:
 $ ./master-up.sh
 ```
 
-Render k8s manifests
+Render k8s manifests, and start bootkube
 ```
 $ doctl compute droplet list
 ID		Name		Public IPv4	Public IPv6	Memory	VCPUs	Disk	Region	Image			Status	Tags
@@ -54,15 +54,11 @@ $ sudo rkt run quay.io/coreos/bootkube:v0.1.4 \
     --asset-dir=/core/cluster \
     --api-servers=https://${COREOS_PUBLIC_IPV4}:443 \
     --etcd-servers=http://${ETCD_IP}:2379
+
 $ sudo chown -R core:core cluster
 $ sudo mkdir -p /etc/kubernetes
 $ sudo cp cluster/auth/kubeconfig /etc/kubernetes/kubeconfig
-$ sudo systemctl start kubelet
-```
 
-Start bootkube
-
-```
 $ sudo rkt run quay.io/coreos/bootkube:v0.1.4 \
     --insecure-options=all \
     --volume=core,kind=host,source=/home/core \
@@ -72,6 +68,11 @@ $ sudo rkt run quay.io/coreos/bootkube:v0.1.4 \
     -- start \
     --asset-dir=/core/cluster \
     --etcd-server=http://${ETCD_IP}:2379
+```
+
+In another terminal start kubelet
+```
+$ sudo systemctl start kubelet
 ```
 
 Configure client
