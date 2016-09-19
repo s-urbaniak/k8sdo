@@ -22,41 +22,29 @@ $ ./etcd-up.sh
 ```
 
 Get the internal IP address of the etcd instance:
-
 ```
 $ doctl compute droplet list
 $ export ETCD_IP=$(doctl compute droplet get 25997786 -o json | jq -r -c '.[].networks.v4[] | select(.type=="private").ip_address')
 ```
 
-Create a new Droplet, a bigger master machine:
+Create master node:
 ```
 $ ./master-up.sh
 ```
 
-Render k8s manifests, and start bootkube:
-
+Create worker node:
 ```
 $ doctl compute droplet list
 ID		Name		Public IPv4	Public IPv6	Memory	VCPUs	Disk	Region	Image			Status	Tags
 25985490	etcd-1		188.166.163.26			512	1	20	fra1	CoreOS 1164.1.0 (alpha)active	
 25990476	master-1	138.68.75.149			2048	2	40	fra1	CoreOS 1164.1.0 (alpha)active	
 
-$ doctl compute ssh 25990476 --ssh-user core
-
-$ export ETCD_IP=10.135.20.79
-
-$ ./master-up.sh
-```
-
-In another terminal start kubelet
-```
-$ sudo systemctl start kubelet
-```
-
-Configure client
-```
 $ export MASTER_IP=46.101.244.90
+$ ./worker-up.sh
+```
 
+Configure client:
+```
 $ scp -r core@${MASTER_IP}:~/cluster .
 
 $ kubectl config set-cluster do \
@@ -68,7 +56,6 @@ $ kubectl config set-credentials do \
     --client-key=cluster/tls/apiserver.key
 
 $ kubectl config set-context do --cluster=do --user=do
-
 $ kubectl config use-context do
 ```
 
