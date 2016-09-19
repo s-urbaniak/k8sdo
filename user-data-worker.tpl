@@ -17,20 +17,6 @@ coreos:
           [Service]
           ExecStartPre=/usr/bin/etcdctl --endpoint=http://{{ETCD_IP}}:2379 set /coreos.com/network/config '{ "Network": "10.2.0.0/16" }'
 
-    - name: rkt-api.service
-      enable: true
-      command: start
-      content: |
-        [Unit]
-        Description=rkt api service
-        After=network.target
-
-        [Service]
-        ExecStart=/usr/bin/rkt api-service --listen=127.0.0.1:15441
-
-        [Install]
-        WantedBy=multi-user.target
-
     - name: kubelet.service
       enable: true
       command: start
