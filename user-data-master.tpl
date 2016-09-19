@@ -34,10 +34,11 @@ coreos:
     - name: kubelet.service
       enable: true
       content: |
-        [Service]
-        After=flanneld
-        Requires=flanneld
+        [Unit]
+        After=flanneld.service
+        Requires=flanneld.service
 
+        [Service]
         EnvironmentFile=/etc/environment
         Environment=KUBELET_ACI=quay.io/coreos/hyperkube
         Environment=KUBELET_VERSION=v1.3.6_coreos.0
@@ -47,13 +48,13 @@ coreos:
         ExecStartPre=/bin/mkdir -p /etc/kubernetes/checkpoint-secrets
 
         ExecStart=/usr/lib/coreos/kubelet-wrapper \
-          --api-servers=https://${COREOS_PUBLIC_IPV4}:443 \
+          --api-servers=https://$public_ipv4:443 \
           --kubeconfig=/etc/kubernetes/kubeconfig \
           --lock-file=/var/run/lock/kubelet.lock \
           --exit-on-lock-contention \
           --config=/etc/kubernetes/manifests \
           --allow-privileged \
-          --hostname-override=${COREOS_PUBLIC_IPV4} \
+          --hostname-override=$public_ipv4 \
           --address=$private_ipv4 \
           --node-labels=master=true \
           --minimum-container-ttl-duration=3m0s \
@@ -65,3 +66,46 @@ coreos:
 
         [Install]
         WantedBy=multi-user.target
+
+    - name: bootkube-render.service
+      content: |
+        [Service]
+        Type=oneshot
+
+        ExecStartPre=/bin/mkdir -p /etc/kubernetes
+
+        ExecStart=/usr/bin/rkt run quay.io/coreos/bootkube:v0.1.4 \
+          --user=500 \
+          --group=500 \
+          --insecure-options=image \
+          --volume=core,kind=host,source=/home/core \
+          --mount volume=core,target=/core \
+          --net=none \
+          --exec=/bootkube \
+          -- render \
+          --asset-dir=/core/cluster \
+          --api-servers=https://$public_ipv4:443 \
+          --etcd-servers=http://{{ETCD_IP}}:2379
+
+        ExecStart=/bin/cp /home/core/cluster/auth/kubeconfig /etc/kubernetes/kubeconfig
+
+    - name: bootkube.service
+      command: start
+      content: |
+        [Unit]
+        Requires=bootkube-render.service kubelet.service
+        After=bootkube-render.service
+
+        [Service]
+        Type=oneshot
+
+        ExecStartPre=/bin/mkdir -p /etc/kubernetes
+        ExecStart=/usr/bin/rkt run quay.io/coreos/bootkube:v0.1.4 \
+          --insecure-options=all \
+          --volume=core,kind=host,source=/home/core \
+          --mount volume=core,target=/core \
+          --net=host \
+          --exec=/bootkube \
+          -- start \
+          --asset-dir=/core/cluster \
+          --etcd-server=http://{{ETCD_IP}}:2379

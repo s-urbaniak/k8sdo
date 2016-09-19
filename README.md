@@ -33,7 +33,8 @@ Create a new Droplet, a bigger master machine:
 $ ./master-up.sh
 ```
 
-Render k8s manifests, and start bootkube
+Render k8s manifests, and start bootkube:
+
 ```
 $ doctl compute droplet list
 ID		Name		Public IPv4	Public IPv6	Memory	VCPUs	Disk	Region	Image			Status	Tags
@@ -44,30 +45,7 @@ $ doctl compute ssh 25990476 --ssh-user core
 
 $ export ETCD_IP=10.135.20.79
 
-$ sudo rkt run quay.io/coreos/bootkube:v0.1.4 \
-    --insecure-options=image \
-    --volume=core,kind=host,source=/home/core \
-    --mount volume=core,target=/core \
-    --net=none \
-    --exec=/bootkube \
-    -- render \
-    --asset-dir=/core/cluster \
-    --api-servers=https://${COREOS_PUBLIC_IPV4}:443 \
-    --etcd-servers=http://${ETCD_IP}:2379
-
-$ sudo chown -R core:core cluster
-$ sudo mkdir -p /etc/kubernetes
-$ sudo cp cluster/auth/kubeconfig /etc/kubernetes/kubeconfig
-
-$ sudo rkt run quay.io/coreos/bootkube:v0.1.4 \
-    --insecure-options=all \
-    --volume=core,kind=host,source=/home/core \
-    --mount volume=core,target=/core \
-    --net=host \
-    --exec=/bootkube \
-    -- start \
-    --asset-dir=/core/cluster \
-    --etcd-server=http://${ETCD_IP}:2379
+$ ./master-up.sh
 ```
 
 In another terminal start kubelet
@@ -82,6 +60,7 @@ $ export MASTER_IP=46.101.244.90
 $ scp -r core@${MASTER_IP}:~/cluster .
 
 $ kubectl config set-cluster do \
+    --insecure-skip-tls-verify=true \
     --server=https://${MASTER_IP}:443
 
 $ kubectl config set-credentials do \
