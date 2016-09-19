@@ -39,7 +39,7 @@ ID		Name		Public IPv4	Public IPv6	Memory	VCPUs	Disk	Region	Image			Status	Tags
 25985490	etcd-1		188.166.163.26			512	1	20	fra1	CoreOS 1164.1.0 (alpha)active	
 25990476	master-1	138.68.75.149			2048	2	40	fra1	CoreOS 1164.1.0 (alpha)active	
 
-$ export MASTER_IP=46.101.244.90
+$ export MASTER_IP=138.68.75.149
 $ ./worker-up.sh
 ```
 

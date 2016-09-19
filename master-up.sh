@@ -13,14 +13,14 @@ if [ -z $ETCD_IP ]; then
 fi
 
 DO_REGION="fra1"
-ETCD_SIZE="2gb"
+MASTER_SIZE="2gb"
 
 sed -e "s|{{ETCD_IP}}|${ETCD_IP}|" user-data-master.tpl >user-data-master
 
 doctl compute droplet create "master-1" \
       --region "${DO_REGION}" \
       --image "coreos-alpha" \
-      --size "${ETCD_SIZE}" \
+      --size "${MASTER_SIZE}" \
       --enable-private-networking \
       --ssh-keys '"'"${SSH_KEY}"'"' \
       --user-data-file user-data-master
