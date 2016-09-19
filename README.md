@@ -24,7 +24,7 @@ $ ./etcd-up.sh
 Get the internal IP address of the etcd instance:
 ```
 $ doctl compute droplet list
-$ export ETCD_IP=$(doctl compute droplet get 25997786 -o json | jq -r -c '.[].networks.v4[] | select(.type=="private").ip_address')
+$ export ETCD_IP=$(doctl compute droplet get $(doctl compute droplet list --format ID,Name --no-header | grep etcd-1 | cut -f1) -o json | jq -r -c '.[].networks.v4[] | select(.type=="private").ip_address')
 ```
 
 Create master node:
@@ -39,7 +39,7 @@ ID		Name		Public IPv4	Public IPv6	Memory	VCPUs	Disk	Region	Image			Status	Tags
 25985490	etcd-1		188.166.163.26			512	1	20	fra1	CoreOS 1164.1.0 (alpha)active	
 25990476	master-1	138.68.75.149			2048	2	40	fra1	CoreOS 1164.1.0 (alpha)active	
 
-$ export MASTER_IP=138.68.75.149
+$ export MASTER_IP=$(doctl compute droplet list --format PublicIPv4,Name --no-header | grep master-1 | cut -f1)
 $ ./worker-up.sh
 ```
 
