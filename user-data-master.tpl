@@ -41,7 +41,7 @@ coreos:
           --config=/etc/kubernetes/manifests \
           --allow-privileged \
           --hostname-override=$public_ipv4 \
-          --address=$private_ipv4 \
+          --address=127.0.0.1 \
           --node-labels=master=true \
           --minimum-container-ttl-duration=3m0s \
           --cluster_dns=10.3.0.10 \
@@ -88,7 +88,9 @@ coreos:
         ExecStartPre=/bin/mkdir -p /etc/kubernetes
         ExecStart=/usr/bin/rkt run quay.io/coreos/bootkube:v0.1.4 \
           --insecure-options=all \
+          --volume=dev,kind=host,source=/dev \
           --volume=core,kind=host,source=/home/core \
+          --mount volume=dev,target=/dev \
           --mount volume=core,target=/core \
           --net=host \
           --exec=/bootkube \

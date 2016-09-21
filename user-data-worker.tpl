@@ -42,7 +42,7 @@ coreos:
           --config=/etc/kubernetes/manifests \
           --allow-privileged \
           --hostname-override=$public_ipv4 \
-          --address=$private_ipv4 \
+          --address=127.0.0.1 \
           --minimum-container-ttl-duration=3m0s \
           --cluster_dns=10.3.0.10 \
           --cluster_domain=cluster.local
